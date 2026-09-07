@@ -1,6 +1,11 @@
 <?php
 include 'conexion.php';
 
+// Asignar $conn a $pdo en caso de que conexion.php use $conn
+if (!isset($pdo) && isset($conn)) {
+    $pdo = $conn;
+}
+
 $filtro = isset($_GET['cat']) ? $_GET['cat'] : 'todos';
 
 if ($filtro !== 'todos') {
@@ -59,7 +64,7 @@ if ($filtro !== 'todos') {
     </div>
 
     <div class="gallery-grid">
-        <?php if (count($capturas) > 0): ?>
+        <?php if (isset($capturas) && count($capturas) > 0): ?>
             <?php foreach ($capturas as $row): ?>
                 <div class="gallery-item">
                     <img src="<?php echo htmlspecialchars($row['imagen_path']); ?>" alt="<?php echo htmlspecialchars($row['titulo']); ?>">
