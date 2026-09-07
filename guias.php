@@ -1,7 +1,7 @@
 <?php
 include 'conexion.php';
 
-$stmt = $conn->query("SELECT * FROM guias ORDER BY id DESC");
+$stmt = $conexion->query("SELECT * FROM guias ORDER BY id DESC");
 $guias = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
@@ -24,6 +24,7 @@ $guias = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <nav>
         <a href="index.php">Inicio</a>
         <a href="galeria.php">Galería</a>
+        <a href="guias.php">Guías</a>
         <a href="bitacora.php">Bitácora</a>
         <a href="subir_foto.php">+ Registrar Foto</a>
     </nav>
