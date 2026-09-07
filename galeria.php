@@ -1,16 +1,16 @@
-<<?php
+<?php
 include 'conexion.php';
 
 $filtro = isset($_GET['cat']) ? $_GET['cat'] : 'todos';
 
 if ($filtro !== 'todos') {
-    $stmt = $conn->prepare("SELECT * FROM capturas WHERE objeto_celeste LIKE ? OR titulo LIKE ? ORDER BY fecha_observacion DESC");
+    $stmt = $conexion->prepare("SELECT * FROM capturas WHERE objeto_celeste LIKE ? OR titulo LIKE ? ORDER BY fecha_observacion DESC");
     $param = "%" . $filtro . "%";
-    $stmt->bind_param("ss", $param, $param);
-    $stmt->execute();
-    $resultado = $stmt->get_result();
+    $stmt->execute([$param, $param]);
+    $capturas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } else {
-    $resultado = $conn->query("SELECT * FROM capturas ORDER BY fecha_observacion DESC");
+    $stmt = $conexion->query("SELECT * FROM capturas ORDER BY fecha_observacion DESC");
+    $capturas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 ?>
 <!DOCTYPE html>
@@ -45,6 +45,7 @@ if ($filtro !== 'todos') {
     <nav>
         <a href="index.php">Inicio</a>
         <a href="galeria.php">Galería</a>
+        <a href="guias.php">Guías</a>
         <a href="bitacora.php">Bitácora</a>
         <a href="subir_foto.php">+ Registrar Foto</a>
     </nav>
@@ -59,8 +60,8 @@ if ($filtro !== 'todos') {
     </div>
 
     <div class="gallery-grid">
-        <?php if ($resultado && $resultado->num_rows > 0): ?>
-            <?php while ($row = $resultado->fetch_assoc()): ?>
+        <?php if (isset($capturas) && count($capturas) > 0): ?>
+            <?php foreach ($capturas as $row): ?>
                 <div class="gallery-item">
                     <img src="<?php echo htmlspecialchars($row['imagen_path']); ?>" alt="<?php echo htmlspecialchars($row['titulo']); ?>">
                     <div class="overlay">
@@ -69,7 +70,7 @@ if ($filtro !== 'todos') {
                         <p>📅 <?php echo htmlspecialchars($row['fecha_observacion']); ?></p>
                     </div>
                 </div>
-            <?php endwhile; ?>
+            <?php endforeach; ?>
         <?php else: ?>
             <p style="grid-column: 1/-1; text-align: center; color: #a0a6ed;">No hay fotografías disponibles para este filtro.</p>
         <?php endif; ?>
