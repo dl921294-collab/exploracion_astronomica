@@ -4,7 +4,7 @@ error_reporting(E_ALL);
 
 include 'conexion.php';
 
-$stmt = $pdo->query("SELECT * FROM capturas ORDER BY fecha_observacion DESC");
+$stmt = $conn->query("SELECT * FROM capturas ORDER BY fecha_observacion DESC");
 $capturas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>

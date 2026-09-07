@@ -1,7 +1,7 @@
 <?php
 include 'conexion.php';
 
-$stmt = $pdo->query("SELECT * FROM guias ORDER BY id DESC");
+$stmt = $conn->query("SELECT * FROM guias ORDER BY id DESC");
 $guias = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>

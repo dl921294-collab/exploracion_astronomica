@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $sql = "INSERT INTO capturas (titulo, objeto_celeste, fecha_observacion, telescopio, camara, tiempo_exposicion, imagen_path, notas) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         
-        $stmt = $pdo->prepare($sql);
+        $stmt = $conn->prepare($sql);
         
         if ($stmt->execute([$titulo, $objeto, $fecha, $telescopio, $camara, $exposicion, $ruta_bd, $notas])) {
             echo "¡Captura registrada exitosamente! <a href='bitacora.php'>Ver bitácora</a>";
