@@ -1,40 +1,24 @@
 <?php
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
 include 'conexion.php';
 
-$stmt = $conn->query("SELECT * FROM capturas ORDER BY fecha_observacion DESC");
-$capturas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmt = $conexion->query("SELECT * FROM bitacora ORDER BY fecha DESC");
+$registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Bitácora de Astrofotografía</title>
+    <title>Bitácora de Observación</title>
     <style>
-        nav {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            background-color: #15192b;
-            padding: 15px;
-        }
-        nav a {
-            color: #70a1ff;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        body { background-color: #0b0d17; color: #a0a6ed; font-family: sans-serif; padding: 20px; text-align: center; }
-        h1 { color: #4880ff; }
-        .btn { display: inline-block; background-color: #70a1ff; color: #0b0d17; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-bottom: 30px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; text-align: left; max-width: 1000px; margin: 0 auto; }
-        .card { background: #15192b; border-radius: 8px; overflow: hidden; border: 1px solid #2a3150; }
-        .card img { width: 100%; height: 200px; object-fit: cover; }
-        .card-body { padding: 15px; }
-        .card-title { margin: 0 0 10px 0; color: #70a1ff; }
-        .tech-specs { font-size: 0.85em; background: #0b0d17; padding: 8px; border-radius: 4px; margin-top: 10px; }
-        .empty-msg { background: #15192b; padding: 30px; border-radius: 8px; border: 1px solid #2a3150; max-width: 500px; margin: 0 auto; }
+        body { background-color: #0b0d17; color: #a0a6ed; font-family: sans-serif; padding: 20px; }
+        h1 { text-align: center; color: #4880ff; }
+        nav { display: flex; justify-content: center; gap: 20px; background: #15192b; padding: 15px; border-radius: 8px; margin-bottom: 30px; }
+        nav a { color: #70a1ff; text-decoration: none; font-weight: bold; }
+        .table-container { max-width: 900px; margin: 0 auto; background: #15192b; border-radius: 8px; overflow: hidden; border: 1px solid #2a3150; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 12px 15px; border-bottom: 1px solid #2a3150; font-size: 0.9em; }
+        th { background: #1c223c; color: #70a1ff; }
+        tr:hover { background: #181d35; }
     </style>
 </head>
 <body>
@@ -42,40 +26,39 @@ $capturas = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <a href="index.php">Inicio</a>
         <a href="galeria.php">Galería</a>
         <a href="guias.php">Guías</a>
+        <a href="bitacora.php">Bitácora</a>
         <a href="subir_foto.php">+ Registrar Foto</a>
     </nav>
 
-    <h1>Bitácora de Observación Astrofotográfica</h1>
-    <a href="subir_foto.php" class="btn">+ Registrar nueva foto</a>
+    <h1>Bitácora de Observación</h1>
 
-    <?php if (count($capturas) > 0): ?>
-        <div class="grid">
-            <?php foreach ($capturas as $row): ?>
-                <div class="card">
-                    <img src="<?php echo htmlspecialchars($row['imagen_path']); ?>" alt="<?php echo htmlspecialchars($row['titulo']); ?>">
-                    <div class="card-body">
-                        <h3 class="card-title"><?php echo htmlspecialchars($row['titulo']); ?></h3>
-                        <p><strong>Objeto:</strong> <?php echo htmlspecialchars($row['objeto_celeste']); ?></p>
-                        <p><strong>Fecha:</strong> <?php echo htmlspecialchars($row['fecha_observacion']); ?></p>
-                        
-                        <div class="tech-specs">
-                            <p>🔭 <strong>Telescopio:</strong> <?php echo htmlspecialchars($row['telescopio']); ?></p>
-                            <p>📷 <strong>Cámara:</strong> <?php echo htmlspecialchars($row['camara']); ?></p>
-                            <p>⏱️ <strong>Exposición:</strong> <?php echo htmlspecialchars($row['tiempo_exposicion']); ?></p>
-                        </div>
-
-                        <?php if (!empty($row['notas'])): ?>
-                            <p><small><?php echo htmlspecialchars($row['notas']); ?></small></p>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            <?php endforeach; ?>
-        </div>
-    <?php else: ?>
-        <div class="empty-msg">
-            <p>No hay fotos guardadas en la base de datos todavía.</p>
-            <p>Haz clic en el botón de arriba para registrar tu primera captura.</p>
-        </div>
-    <?php endif; ?>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Objeto / Evento</th>
+                    <th>Equipo Usado</th>
+                    <th>Notas</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (count($registros) > 0): ?>
+                    <?php foreach ($registros as $row): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($row['fecha']); ?></td>
+                            <td><strong><?php echo htmlspecialchars($row['objeto']); ?></strong></td>
+                            <td><?php echo htmlspecialchars($row['equipo']); ?></td>
+                            <td><?php echo htmlspecialchars($row['notas']); ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 20px;">No hay registros en la bitácora todavía.</td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>
