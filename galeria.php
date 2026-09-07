@@ -1,21 +1,16 @@
-<?php
+<<?php
 include 'conexion.php';
-
-// Asignar $conn a $pdo en caso de que conexion.php use $conn
-if (!isset($pdo) && isset($conn)) {
-    $pdo = $conn;
-}
 
 $filtro = isset($_GET['cat']) ? $_GET['cat'] : 'todos';
 
 if ($filtro !== 'todos') {
-    $stmt = $pdo->prepare("SELECT * FROM capturas WHERE objeto_celeste LIKE ? OR titulo LIKE ? ORDER BY fecha_observacion DESC");
+    $stmt = $conn->prepare("SELECT * FROM capturas WHERE objeto_celeste LIKE ? OR titulo LIKE ? ORDER BY fecha_observacion DESC");
     $param = "%" . $filtro . "%";
-    $stmt->execute([$param, $param]);
-    $capturas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt->bind_param("ss", $param, $param);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
 } else {
-    $stmt = $pdo->query("SELECT * FROM capturas ORDER BY fecha_observacion DESC");
-    $capturas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $resultado = $conn->query("SELECT * FROM capturas ORDER BY fecha_observacion DESC");
 }
 ?>
 <!DOCTYPE html>
@@ -64,8 +59,8 @@ if ($filtro !== 'todos') {
     </div>
 
     <div class="gallery-grid">
-        <?php if (isset($capturas) && count($capturas) > 0): ?>
-            <?php foreach ($capturas as $row): ?>
+        <?php if ($resultado && $resultado->num_rows > 0): ?>
+            <?php while ($row = $resultado->fetch_assoc()): ?>
                 <div class="gallery-item">
                     <img src="<?php echo htmlspecialchars($row['imagen_path']); ?>" alt="<?php echo htmlspecialchars($row['titulo']); ?>">
                     <div class="overlay">
@@ -74,7 +69,7 @@ if ($filtro !== 'todos') {
                         <p>📅 <?php echo htmlspecialchars($row['fecha_observacion']); ?></p>
                     </div>
                 </div>
-            <?php endforeach; ?>
+            <?php endwhile; ?>
         <?php else: ?>
             <p style="grid-column: 1/-1; text-align: center; color: #a0a6ed;">No hay fotografías disponibles para este filtro.</p>
         <?php endif; ?>
