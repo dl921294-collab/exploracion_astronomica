@@ -1,14 +1,13 @@
 <?php
-$host = getenv('MYSQL_ADDON_HOST');
-$port = getenv('MYSQL_ADDON_PORT');
-$db   = getenv('MYSQL_ADDON_DB');
-$user = getenv('MYSQL_ADDON_USER');
-$pass = getenv('MYSQL_ADDON_PASSWORD');
+$host = 'buf2i22d9jjzquzocz1h-mysql.services.clever-cloud.com';
+$dbname = 'buf2i22d9jjzquzocz1h';
+$username = 'urtyehr0owaf49a6';
+$password = '9espOFbJ2LZTy0EMXpsN'; // Mantén tu contraseña real aquí
 
 try {
-    $conexion = new PDO("mysql:host=$host;port=$port;dbname=$db;charset=utf8mb4", $user, $pass, [
+    $conexion = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password, [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+        PDO::ATTR_TIMEOUT => 5 // Si no conecta en 5 segundos, muestra error rápido en vez de congelarse
     ]);
 } catch (PDOException $e) {
     die("Error de conexión a la base de datos: " . $e->getMessage());
