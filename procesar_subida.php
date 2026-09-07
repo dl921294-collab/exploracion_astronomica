@@ -2,37 +2,32 @@
 include 'conexion.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $titulo = $_POST['titulo'];
-    $objeto = $_POST['objeto_celeste'];
-    $fecha = $_POST['fecha_observacion'];
-    $telescopio = $_POST['telescopio'];
-    $camara = $_POST['camara'];
-    $exposicion = $_POST['tiempo_exposicion'];
-    $notas = $_POST['notas'];
+    $titulo = $_POST['titulo'] ?? '';
+    $objeto_celeste = $_POST['objeto_celeste'] ?? '';
+    $fecha_observacion = $_POST['fecha_observacion'] ?? '';
 
-    $directorio_destino = __DIR__ . '/uploads/';
-
-    if (!file_exists($directorio_destino)) {
-        mkdir($directorio_destino, 0777, true);
+    // Crear la carpeta uploads automáticamente si no existe
+    $directorio_uploads = 'uploads/';
+    if (!is_dir($directorio_uploads)) {
+        mkdir($directorio_uploads, 0755, true);
     }
 
-    $nombre_foto = time() . '_' . basename($_FILES['imagen']['name']);
-    $ruta_servidor = $directorio_destino . $nombre_foto;
-    $ruta_bd = 'uploads/' . $nombre_foto;
+    if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
+        $nombre_archivo = time() . '_' . basename($_FILES['imagen']['name']);
+        $ruta_destino = $directorio_uploads . $nombre_archivo;
 
-    if (move_uploaded_file($_FILES['imagen']['tmp_name'], $ruta_servidor)) {
-        $sql = "INSERT INTO capturas (titulo, objeto_celeste, fecha_observacion, telescopio, camara, tiempo_exposicion, imagen_path, notas) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        
-        $stmt = $conn->prepare($sql);
-        
-        if ($stmt->execute([$titulo, $objeto, $fecha, $telescopio, $camara, $exposicion, $ruta_bd, $notas])) {
-            echo "¡Captura registrada exitosamente! <a href='bitacora.php'>Ver bitácora</a>";
+        if (move_uploaded_file($_FILES['imagen']['tmp_name'], $ruta_destino)) {
+            // Guardar los datos en la base de datos
+            $stmt = $conexion->prepare("INSERT INTO capturas (titulo, objeto_celeste, fecha_observacion, imagen_path) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$titulo, $objeto_celeste, $fecha_observacion, $ruta_destino]);
+
+            header("Location: galeria.php");
+            exit();
         } else {
-            echo "Error al insertar en la base de datos.";
+            echo "Error al guardar el archivo en la carpeta uploads.";
         }
     } else {
-        echo "Error al guardar el archivo en la carpeta uploads.";
+        echo "Error en la subida de la imagen.";
     }
 }
 ?>
